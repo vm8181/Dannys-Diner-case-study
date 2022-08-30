@@ -113,8 +113,22 @@
 
 ![image](https://user-images.githubusercontent.com/92555446/187384014-eb335d4a-7a0f-4ce6-8083-31e8f464bb77.png)
 
+## Bonus Questions:
+**The following questions are related creating basic data tables that Danny and his team can use to quickly derive insights without needing 
+to join the underlying tables using SQL.**
+
+![image](https://user-images.githubusercontent.com/92555446/187486580-fc2e61ec-73bb-434c-87a8-7426c14a7357.png)
+![image](https://user-images.githubusercontent.com/92555446/187486646-898c2bd8-a91c-4a32-bf09-692b6fb47f9f.png)
+
+**Danny also requires further information about the ranking of customer products, but he purposely does not need the ranking for non-member 
+purchases so he expects null ranking values for the records when customers are not yet part of the loyalty program.**
+
+![image](https://user-images.githubusercontent.com/92555446/187486887-c7c2bc40-62cc-4c40-a204-bcac780519e3.png)
+![image](https://user-images.githubusercontent.com/92555446/187487099-5fed4ba1-9d30-4bd0-983a-cfc4ae1996f6.png)
 
 # Tool Used:
+
+Microsoft Excel
 
 SQL Server
 
