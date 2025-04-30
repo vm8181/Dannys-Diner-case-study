@@ -345,9 +345,9 @@ FROM cte;
 
 ## Tool Used:
 
-- Microsoft Excel
+- SQL Scripting
 
-- SQL Server
+- SQL Server Database
 
 ## Conclusion
 Through the Danny’s Diner SQL case study, we explored essential SQL concepts including:
