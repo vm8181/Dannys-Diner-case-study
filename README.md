@@ -1,5 +1,5 @@
 # Danny-s-Diner-case-study
-
+Solution to the [Danny's Diner](https://8weeksqlchallenge.com/case-study-1/) case study challenge using SQL. The goal is to analyze customer spending behavior at a fictional restaurant using three tables: `sales`, `menu`, and `members`.
 ## Introduction:
 
 ![image](https://user-images.githubusercontent.com/92555446/187380541-3e69f5d8-dd41-408e-9945-46e7994f684e.png)
@@ -24,90 +24,324 @@
 - **If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
 - **In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A     and B have at the end of January?**
 
-**Danny has shared with you 3 key datasets for this case study:**
+## 📂 Dataset Overview
 
-- sales
+- **`sales`**: records of customer purchases with product and order date
+- **`menu`**: item details and prices
+- **`members`**: loyalty program sign-up dates
 
-- menu
-
-- members
 
 ![image](https://user-images.githubusercontent.com/92555446/187381281-053700c7-de51-4576-b06b-09c679a226ac.png)
 
-## Solution:
+## 🧠 Case Study Questions and Solutions
 
-:red_square: **What is the total amount each customer spent at the restaurant?**
+## 1. What is the total amount each customer spent at the restaurant?
 
-![image](https://user-images.githubusercontent.com/92555446/187382384-354fd830-46c6-4ff0-b6c1-bbb37f9be88b.png)
-![image](https://user-images.githubusercontent.com/92555446/187382519-fae1a416-f5ba-4aa7-8e0d-99c58968807f.png)
+**SQL Query:**
+```sql
+SELECT 
+    s.customer_id,
+    SUM(m.price) AS total_spent
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id;
+```
 
-
-:red_square: **How many days has each customer visited the restaurant?**
-
-![image](https://user-images.githubusercontent.com/92555446/187382564-4cd8d5e9-b350-40bd-94c6-b0ebfceffb60.png)
-![image](https://user-images.githubusercontent.com/92555446/187382618-b4c09209-0e0d-46b3-b38b-bec1be0f6311.png)
-
-
-**What was the first item from the menu purchased by each customer?**
-
-![image](https://user-images.githubusercontent.com/92555446/187382713-48f57ad4-52c9-42f0-9cfd-283a8ed98eb2.png)
-
-![image](https://user-images.githubusercontent.com/92555446/187382774-50f1b23e-ae91-4b5d-9451-b95551a20f16.png)
-
-
-:red_square: **What is the most purchased item on the menu and how many times was it purchased by all customers?**
-
-![image](https://user-images.githubusercontent.com/92555446/187382843-00a4fd8e-d628-4f79-8930-e8bfec186337.png)
-![image](https://user-images.githubusercontent.com/92555446/187382881-c312e65b-5d0e-4813-9422-989da93930d7.png)
+**Sample Output:**
+| customer_id   |   total_spent |
+|:--------------|--------------:|
+| A             |            76 |
+| B             |            74 |
+| C             |            36 |
 
 
-:red_square: **Which item was the most popular for each customer?**
+## 2. How many days has each customer visited the restaurant?
 
-![image](https://user-images.githubusercontent.com/92555446/187383083-6ec2939b-ee83-484b-a7c3-6acb2e14a73c.png)
-![image](https://user-images.githubusercontent.com/92555446/187383138-7f9cfed3-af6c-490b-84f7-657b2d3059d5.png)
+**SQL Query:**
+```sql
+SELECT 
+    customer_id,
+    COUNT(DISTINCT order_date) AS visit_days
+FROM sales
+GROUP BY customer_id;
+```
 
-
-:red_square: **Which item was purchased first by the customer after they became a member?**
-
-![image](https://user-images.githubusercontent.com/92555446/187383219-ae19a073-e14e-445f-aadb-de25e14f166d.png)
-![image](https://user-images.githubusercontent.com/92555446/187383274-a0ad567a-1745-4de8-bea6-71d7ad4c0cdf.png)
-
-
-:red_square: **Which item was purchased first just before the customer became a member?**
-
-![image](https://user-images.githubusercontent.com/92555446/187383346-39f2aee1-438a-4590-9b27-5da1cefa6811.png)
-![image](https://user-images.githubusercontent.com/92555446/187383501-6bbd52ef-d101-4b75-8ef8-840c33a376a7.png)
-
-
-:red_square: **What is the total items and amount spent for each member before they became a member?**
-
-![image](https://user-images.githubusercontent.com/92555446/187383672-3f2a4504-2a70-498d-b602-6a31d51209ec.png)
-![image](https://user-images.githubusercontent.com/92555446/187383722-624960ba-2015-4840-96d8-6a69be7ab2a0.png)
+**Sample Output:**
+| customer_id   |   visit_days |
+|:--------------|-------------:|
+| A             |            4 |
+| B             |            6 |
+| C             |            2 |
 
 
-:red_square: **If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?**
+## 3. What was the first item from the menu purchased by each customer?
 
-![image](https://user-images.githubusercontent.com/92555446/187383805-518e13fb-edc6-4957-9b2e-e60b58352205.png)
-![image](https://user-images.githubusercontent.com/92555446/187383859-609fce47-361c-46ca-8bbd-c3b94ed6eabd.png)
+**SQL Query:**
+```sql
+SELECT 
+    customer_id,
+    product_name
+FROM (
+    SELECT 
+        s.customer_id,
+        s.order_date,
+        m.product_name,
+        RANK() OVER (PARTITION BY s.customer_id ORDER BY s.order_date) AS rnk
+    FROM sales s
+    JOIN menu m ON s.product_id = m.product_id
+) ranked
+WHERE rnk = 1;
+```
 
-:red_square: **In the first week after a customer joins the program (including their join date) they earn 2x points on all items, 
-  not just sushi - how many points do customer A and B have at the end of January?**
-  
-![image](https://user-images.githubusercontent.com/92555446/187383978-a02ef241-05a6-4628-96da-7c9d4c5e1d26.png)
-![image](https://user-images.githubusercontent.com/92555446/187384014-eb335d4a-7a0f-4ce6-8083-31e8f464bb77.png)
+**Sample Output:**
+| customer_id   | product_name   |
+|:--------------|:---------------|
+| A             | curry          |
+| B             | sushi          |
+| C             | ramen          |
 
-## Bonus Questions:
+
+## 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+
+**SQL Query:**
+```sql
+SELECT 
+    m.product_name,
+    COUNT(*) AS purchase_count
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY m.product_name
+ORDER BY purchase_count DESC
+LIMIT 1;
+```
+
+**Sample Output:**
+| product_name   |   purchase_count |
+|:---------------|-----------------:|
+| ramen          |                8 |
+
+
+## 5. Which item was the most popular for each customer?
+
+**SQL Query:**
+```sql
+SELECT customer_id, product_name, purchase_count
+FROM (
+    SELECT 
+        s.customer_id,
+        m.product_name,
+        COUNT(*) AS purchase_count,
+        RANK() OVER (PARTITION BY s.customer_id ORDER BY COUNT(*) DESC) AS rnk
+    FROM sales s
+    JOIN menu m ON s.product_id = m.product_id
+    GROUP BY s.customer_id, m.product_name
+) ranked
+WHERE rnk = 1;
+```
+
+**Sample Output:**
+| customer_id   | product_name   |   purchase_count |
+|:--------------|:---------------|-----------------:|
+| A             | ramen          |                3 |
+| B             | sushi          |                2 |
+| C             | ramen          |                2 |
+
+
+## 6. Which item was purchased first by the customer after they became a member?
+
+**SQL Query:**
+```sql
+SELECT customer_id, order_date, product_name
+FROM (
+    SELECT 
+        s.customer_id,
+        s.order_date,
+        m.product_name,
+        RANK() OVER (PARTITION BY s.customer_id ORDER BY s.order_date) AS rnk
+    FROM sales s
+    JOIN members mem ON s.customer_id = mem.customer_id
+    JOIN menu m ON s.product_id = m.product_id
+    WHERE s.order_date >= mem.join_date
+) ranked
+WHERE rnk = 1;
+```
+
+**Sample Output:**
+| customer_id   | order_date   | product_name   |
+|:--------------|:-------------|:---------------|
+| A             | 2021-01-07   | curry          |
+| B             | 2021-01-11   | sushi          |
+
+
+## 7. Which item was purchased just before the customer became a member?
+
+**SQL Query:**
+```sql
+SELECT customer_id, order_date, product_name
+FROM (
+    SELECT 
+        s.customer_id,
+        s.order_date,
+        m.product_name,
+        RANK() OVER (PARTITION BY s.customer_id ORDER BY s.order_date DESC) AS rnk
+    FROM sales s
+    JOIN members mem ON s.customer_id = mem.customer_id
+    JOIN menu m ON s.product_id = m.product_id
+    WHERE s.order_date < mem.join_date
+) ranked
+WHERE rnk = 1;
+```
+
+**Sample Output:**
+| customer_id   | order_date   | product_name   |
+|:--------------|:-------------|:---------------|
+| A             | 2021-01-01   | ramen          |
+| B             | 2021-01-04   | sushi          |
+
+
+## 8. What is the total items and amount spent for each member before they became a member?
+
+**SQL Query:**
+```sql
+SELECT 
+    s.customer_id,
+    COUNT(*) AS total_items,
+    SUM(m.price) AS total_spent
+FROM sales s
+JOIN members mem ON s.customer_id = mem.customer_id
+JOIN menu m ON s.product_id = m.product_id
+WHERE s.order_date < mem.join_date
+GROUP BY s.customer_id;
+```
+
+**Sample Output:**
+| customer_id   |   total_items |   total_spent |
+|:--------------|--------------:|--------------:|
+| A             |             2 |            25 |
+| B             |             1 |            20 |
+
+
+## 9. If each $1 spent equates to 10 points and sushi has a 2x points multiplier, how many points would each customer have?
+
+**SQL Query:**
+```sql
+SELECT 
+    s.customer_id,
+    SUM(
+        CASE 
+            WHEN m.product_name = 'sushi' THEN m.price * 20
+            ELSE m.price * 10
+        END
+    ) AS total_points
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+GROUP BY s.customer_id;
+```
+
+**Sample Output:**
+| customer_id   |   total_points |
+|:--------------|---------------:|
+| A             |            860 |
+| B             |            940 |
+| C             |            360 |
+
+
+## 10. In the first week after a customer joins the program (including their join date), what is the total number of points they earned?
+
+**SQL Query:**
+```sql
+SELECT 
+    s.customer_id,
+    SUM(
+        CASE 
+            WHEN m.product_name = 'sushi' THEN m.price * 20
+            ELSE m.price * 10
+        END
+    ) AS points_earned
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+JOIN members mem ON s.customer_id = mem.customer_id
+WHERE s.order_date BETWEEN mem.join_date AND DATE(mem.join_date, '+6 days')
+GROUP BY s.customer_id;
+```
+
+**Sample Output:**
+| customer_id   |   points_earned |
+|:--------------|----------------:|
+| A             |             250 |
+| B             |             400 |
+
+
+## 🎁 Bonus Questions
 :red_square: **The following questions are related creating basic data tables that Danny and his team can use to quickly derive insights without needing 
 to join the underlying tables using SQL.**
+- customer_id
+- order_date
+- product_name
+- price
+- member (Y/N indicating if the customer was a member at the time of order)
 
-![image](https://user-images.githubusercontent.com/92555446/187486580-fc2e61ec-73bb-434c-87a8-7426c14a7357.png)
-![image](https://user-images.githubusercontent.com/92555446/187486646-898c2bd8-a91c-4a32-bf09-692b6fb47f9f.png)
+**SQL Query:**
+```sql
+SELECT
+    s.customer_id,
+    s.order_date,
+    m.product_name,
+    m.price,
+    CASE
+        WHEN s.order_date >= mem.join_date THEN 'Y'
+        ELSE 'N'
+    END AS member
+FROM sales s
+JOIN menu m ON s.product_id = m.product_id
+LEFT JOIN members mem ON s.customer_id = mem.customer_id;
+```
 
-:red_square: **Danny also requires further information about the ranking of customer products, but he purposely does not need the ranking for non-member 
-purchases so he expects null ranking values for the records when customers are not yet part of the loyalty program.**
+**Sample Output:**
+| customer_id   | order_date   | product_name   |   price | member   |
+|:--------------|:-------------|:---------------|--------:|:---------|
+| A             | 2021-01-01   | sushi          |      10 | N        |
+| A             | 2021-01-01   | curry          |      15 | N        |
+| A             | 2021-01-07   | curry          |      15 | Y        |
+| B             | 2021-01-11   | sushi          |      10 | Y        |
+| C             | 2021-01-01   | ramen          |      12 | N        |
 
-![image](https://user-images.githubusercontent.com/92555446/187486887-c7c2bc40-62cc-4c40-a204-bcac780519e3.png)
-![image](https://user-images.githubusercontent.com/92555446/187487099-5fed4ba1-9d30-4bd0-983a-cfc4ae1996f6.png)
+
+## Bonus 2: Rank All The Things
+
+**SQL Query:**
+```sql
+WITH cte AS (
+    SELECT
+        s.customer_id,
+        s.order_date,
+        m.product_name,
+        m.price,
+        CASE
+            WHEN s.order_date >= mem.join_date THEN 'Y'
+            ELSE 'N'
+        END AS member
+    FROM sales s
+    JOIN menu m ON s.product_id = m.product_id
+    LEFT JOIN members mem ON s.customer_id = mem.customer_id
+)
+SELECT
+    *,
+    CASE
+        WHEN member = 'N' THEN NULL
+        ELSE RANK() OVER (PARTITION BY customer_id, member ORDER BY order_date)
+    END AS rank
+FROM cte;
+```
+
+**Sample Output:**
+| customer_id   | order_date   | product_name   |   price | member   |   rank |
+|:--------------|:-------------|:---------------|--------:|:---------|-------:|
+| A             | 2021-01-01   | sushi          |      10 | N        |    nan |
+| A             | 2021-01-07   | curry          |      15 | Y        |      1 |
+| A             | 2021-01-10   | ramen          |      12 | Y        |      2 |
+| B             | 2021-01-04   | sushi          |      10 | N        |    nan |
+| B             | 2021-01-11   | sushi          |      10 | Y        |      1 |
 
 ## Tool Used:
 
@@ -116,9 +350,11 @@ purchases so he expects null ranking values for the records when customers are n
 - SQL Server
 
 ## Conclusion
-This case study was very interesting and help me to gain more confidence in SQL queries to solve problems. The functions I have used to solve the provlems in the case study:
-- Aggregate fn(Count, Sum, Min, Max)
-- Analytical fn(Rank, Dense_rank, Row_number, Over)
-- Filter fn(Where, Order by, Group by, Having)
-- CTE(Common table expressions)
-- Subqueries
+Through the Danny’s Diner SQL case study, we explored essential SQL concepts including:
+
+- Data filtering and aggregation
+- Date comparisons and logic
+- JOIN operations and CASE statements
+- Window functions such as RANK() and ROW_NUMBER()
+
+These 10 core questions and 2 bonus challenges provided valuable hands-on experience in deriving customer insights, calculating loyalty metrics, and structuring readable, modular SQL queries. This case study is an excellent foundation for real-world analytics work in customer behavior, sales performance, and loyalty program analysis.
