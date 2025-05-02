@@ -30,8 +30,8 @@ Solution to the [Danny's Diner](https://8weeksqlchallenge.com/case-study-1/) cas
 - **`menu`**: item details and prices
 - **`members`**: loyalty program sign-up dates
 
+![Danny's ER diagram](https://github.com/user-attachments/assets/d77b5581-3978-4f7e-9e73-d3769d514f42)
 
-![image](https://user-images.githubusercontent.com/92555446/187381281-053700c7-de51-4576-b06b-09c679a226ac.png)
 
 ## 🧠 Case Study Questions and Solutions
 
